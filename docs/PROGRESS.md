@@ -19,3 +19,15 @@ Install Android Studio, then build the Kotlin app against this contract. Create 
 - Android Studio installed (winget). SDK at `%LOCALAPPDATA%\Android\Sdk` with platform-tools, platforms android-36 and android-37.0, build-tools 36.0.0. Gradle wrapper 9.8.0, AGP 9.4.1, Kotlin compose plugin 2.4.20, Compose BOM 2026.09.00 (needs compileSdk 37).
 - `android/`: minimal Compose app. `gradlew assembleDebug testDebugUnitTest` succeeded and produced `app-debug.apk`; smoke unit test passed. Nothing has been run on a device or emulator yet.
 - `android/local.properties` holds the machine-specific SDK path (git-ignored); recreate it on another machine with `sdk.dir=<path to Android SDK>`.
+
+## Update: Kotlin port and rules tests (2026-09-30)
+- `core/`: `npm run test:rules` runs 15 Firestore rules tests in the emulator; all pass. `npm test` still 21 passing.
+- `android/`: Kotlin port of the pipeline (`domain/`, `data/`) plus Home and result screens (`ui/`). `gradlew assembleDebug testDebugUnitTest`: BUILD SUCCESSFUL, 18 unit tests pass (17 pipeline tests on real recorded responses, 1 smoke).
+- NOT done: the app has not been run on a phone or emulator; the real network path (HttpURLConnection) has only been exercised through the Node live check, not from Android.
+- NOT done: `firestore.rules` is NOT deployed (Firebase CLI login was not completed). The live database currently denies all client access.
+- NOT done: Firestore/Auth are not yet used by the app; no saved analyses, device onboarding, sensor screens, comparison or charts.
+
+## Deploy the rules (owner, once)
+    cd core
+    npx firebase login
+    npx firebase deploy --only firestore:rules --project helianthic --config ../firebase.json

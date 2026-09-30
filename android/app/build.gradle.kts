@@ -34,4 +34,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
 
     testImplementation("junit:junit:4.13.2")
+    // android.jar's org.json is stubbed in JVM unit tests; use the real library there.
+    testImplementation("org.json:json:20260814")
 }

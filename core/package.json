@@ -11,7 +11,9 @@
     "live-check": "tsc && node lib/live-check.js"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@types/node": "^26.6.3",
+    "firebase": "^12.19.0",
     "firebase-tools": "^15.32.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"

@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Everything is denied unless a rule below allows it.
+
+    // Saved analyses: only the signed-in user who owns them.
+    match /analyses/{analysisId} {
+      allow read, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Devices: owner manages; `authUid` is the Firebase Auth uid the physical device signs in as.
+    match /devices/{deviceId} {
+      allow read, update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Sensor readings: only the registered device may create one, with plausible values.
+    // Units are fixed: volts, amps, watts, degrees Celsius. Readings are immutable.
+    match /sensorReadings/{readingId} {
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/devices/$(request.resource.data.deviceId)).data.authUid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['deviceId', 'timestamp', 'voltage', 'current', 'power', 'temperature', 'lightLevel'])
+        && request.resource.data.keys().hasAll(['deviceId', 'timestamp', 'voltage', 'current'])
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.timestamp <= request.time + duration.value(5, 'm')
+        && request.resource.data.voltage is number && request.resource.data.voltage >= 0 && request.resource.data.voltage <= 60
+        && request.resource.data.current is number && request.resource.data.current >= 0 && request.resource.data.current <= 20
+        && (!('power' in request.resource.data) || (request.resource.data.power is number && request.resource.data.power >= 0 && request.resource.data.power <= 1200))
+        && (!('temperature' in request.resource.data) || (request.resource.data.temperature is number && request.resource.data.temperature >= -40 && request.resource.data.temperature <= 125))
+        && (!('lightLevel' in request.resource.data) || (request.resource.data.lightLevel is number && request.resource.data.lightLevel >= 0));
+      allow read: if request.auth != null
+        && get(/databases/$(database)/documents/devices/$(resource.data.deviceId)).data.ownerUid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Comparisons: owner only.
+    match /comparisons/{comparisonId} {
+      allow read, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}

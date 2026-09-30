@@ -1,0 +1,3 @@
+{ "solarPotential": { "maxArrayPanelsCount": 40, "maxSunshineHoursPerYear": 1800,
+  "wholeRoofStats": { "areaMeters2": 200.5 }, "roofSegmentStats": [ {}, {}, {} ],
+  "solarPanelConfigs": [ { "panelsCount": 10, "yearlyEnergyDcKwh": 4000 }, { "panelsCount": 30, "yearlyEnergyDcKwh": 11000.5 }, { "panelsCount": 20, "yearlyEnergyDcKwh": 8000 } ] } }

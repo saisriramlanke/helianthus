@@ -16,3 +16,6 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 .firebase/
+
+# Firebase client config (not a secret, but keep out of a shared repo)
+google-services.json

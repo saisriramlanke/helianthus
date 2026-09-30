@@ -10,7 +10,7 @@ Defaults chosen at project start. Change a row here if the owner overrides it.
 | Secrets | Firebase Secret Manager (`defineSecret`) |
 | Region | us-central1 |
 | Device auth | Per-device random token; backend stores only its hash |
-| Package name | **OPEN** (needed at phase 2, e.g. `com.example.helianthic`) |
-| Firebase / GCP project ID | **OPEN** (needed at phase 2) |
+| Package name | `com.example.helianthic` (registered in Firebase) |
+| Firebase / GCP project ID | `helianthic` |
 | Prototype access control | **OPEN**: App Check or Anonymous Auth, to stop strangers burning API quota |
 | Comparison basis | **OPEN**: defined in `docs/COMPARISON.md` before phase 11 |

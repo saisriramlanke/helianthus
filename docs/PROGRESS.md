@@ -13,3 +13,8 @@ Not done: the Android project. This machine has no Android SDK or Gradle, so the
 
 ## STOPPED at phase 2
 Needs from the project owner: Firebase project ID on the Blaze plan, APIs enabled, a restricted key stored as a secret, the Android package name. Steps are in `SETUP.md`.
+
+## Update: no Blaze plan
+Owner declined Blaze, so Cloud Functions and Secret Manager are unavailable. Note: Solar and Geocoding APIs still need a billing-enabled Google Cloud project (per Google's get-started page), so a card-backed billing account is needed either way. Firebase project `helianthic` and Android app `com.example.helianthic` already exist (Spark plan). `google-services.json` is in `android/app/` (git-ignored).
+
+Built while waiting (no credentials needed): `geocode.ts`, `solar.ts`, `calc.ts` with fixture tests. 16 tests pass. `yearlySavings` is not parsed until a real response confirms the money format.

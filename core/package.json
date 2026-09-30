@@ -1,19 +1,14 @@
 {
-  "name": "helianthic-functions",
+  "name": "helianthic-core",
   "private": true,
-  "main": "lib/index.js",
   "engines": {
-    "node": "22"
+    "node": ">=20"
   },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "serve": "npm run build && firebase emulators:start --only functions"
-  },
-  "dependencies": {
-    "firebase-admin": "^14.5.0",
-    "firebase-functions": "^7.4.0"
+    "live-check": "tsc && node lib/live-check.js"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",

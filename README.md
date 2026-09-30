@@ -9,8 +9,8 @@ An Android app that estimates the solar-energy potential of a property from its 
 | Area | State |
 |---|---|
 | Address to coordinates to solar estimate (TypeScript reference, `core/`) | Working. 21 unit tests. Live check works against the real APIs. |
-| Same pipeline in Kotlin (`android/`) | Working in unit tests (17 on real recorded API responses). |
-| Android home screen and result screen | Builds. **Never run on a phone or emulator yet.** |
+| Same pipeline in Kotlin (`android/`) | Working. 17 unit tests on real recorded API responses, plus a live test that ran it against the real APIs with the app's own HTTP code (status OK, 1404.93 kWh/yr for the White House address). |
+| Android home screen and result screen | Builds. The real `MainActivity` launches and the screens behave correctly in 5 automated UI tests (Robolectric, on the JVM). **Not yet run on a physical phone or emulator** (see Step 6). |
 | Firestore security rules (`firestore.rules`) | Written, 15 emulator tests pass. **Not deployed yet.** |
 | Firebase project `helianthic` (Spark plan), Firestore database, Email/Password sign-in | Created. |
 | Saved analyses, device registration, live sensor screen, history charts | Not built. |
@@ -117,12 +117,31 @@ Expected: 15 tests pass. The first run downloads the Firestore emulator (about 6
    .\gradlew.bat assembleDebug testDebugUnitTest  # Windows cmd or PowerShell
    ```
 
-   Expected: `BUILD SUCCESSFUL`, 18 unit tests pass, and an APK at `android/app/build/outputs/apk/debug/app-debug.apk`.
+   Expected: `BUILD SUCCESSFUL`, 23 tests pass (2 more are skipped unless you opt in, below), and an APK at `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+   Optional: run the Kotlin pipeline against the real APIs (skipped by default so normal runs never use the network):
+
+   ```bash
+   # macOS / Linux
+   HELIANTHIC_LIVE=1 ./gradlew testDebugUnitTest --tests "*LiveNetworkTest*"
+   # Windows cmd
+   set HELIANTHIC_LIVE=1 && .\gradlew.bat testDebugUnitTest --tests "*LiveNetworkTest*"
+   ```
+
+   **Windows on ARM (Snapdragon laptops):** Robolectric's native runtime does not support ARM64 Windows, so the 5 UI tests fail there. Run the tests on an x64 JDK 21 instead: `gradlew testDebugUnitTest -PtestJvm=C:/path/to/x64-jdk/bin/java.exe`. The Android emulator also cannot run on those machines (no virtualization exposed to the x86 emulator, and it rejects ARM images), so use a physical phone.
 4. The app needs `compileSdk 37`. If Gradle reports a missing platform, install "Android 37" in Android Studio's SDK Manager.
 
-### Step 6: Run the app (first time ever)
+### Step 6: Run the app on a real device
 
-Nobody has run it yet, so expect to find issues. In Android Studio, create an emulator (Device Manager > Create device) or plug in a phone with USB debugging, then press Run. Type an address and tap **Analyze**.
+This is the one check that has not been done: the automated tests cover the code and screens, but nobody has launched the APK on a phone or emulator yet.
+
+1. On an Android phone: Settings > About phone > tap **Build number** 7 times, then Settings > System > Developer options > turn on **USB debugging**.
+2. Plug the phone into the computer and accept the "Allow USB debugging?" prompt on the phone.
+3. In Android Studio, pick the phone in the device dropdown and press Run. (Or from the command line: `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`.)
+4. Type an address such as `1600 Pennsylvania Ave NW, Washington, DC` and tap **Analyze**.
+5. Expected: a LOCATION block, a PROVIDER ESTIMATE block (about 1,405 kWh for that address), a CALCULATED BY HELIANTHIC block, the assumed system, and 12 months of figures. A nonsense address should show "We couldn't find that address..." and turning on airplane mode should show the "couldn't reach the solar data services" message. Anything else is a bug to fix.
+
+If you have no phone, use an x86 or Apple Silicon machine and Android Studio's Device Manager to create an emulator.
 
 ### Step 7: Firebase setup
 

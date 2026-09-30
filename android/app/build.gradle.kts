@@ -19,10 +19,20 @@ android {
         compose = true
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+// Robolectric's native runtime does not support Windows on ARM64. On such a machine, run the tests
+// on an x64 JDK:  gradlew testDebugUnitTest -PtestJvm=C:/path/to/x64-jdk/bin/java.exe
+tasks.withType<Test>().configureEach {
+    (findProperty("testJvm") as String?)?.let { executable = it }
 }
 
 dependencies {
@@ -36,4 +46,13 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     // android.jar's org.json is stubbed in JVM unit tests; use the real library there.
     testImplementation("org.json:json:20260814")
+
+    // UI tests that run the real Activity and Compose screens on the JVM (Robolectric).
+    testImplementation("org.robolectric:robolectric:4.17")
+    testImplementation("androidx.test:core:1.7.0")
+    testImplementation("androidx.test.ext:junit:1.3.0")
+    testImplementation(composeBom)
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation(composeBom)
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

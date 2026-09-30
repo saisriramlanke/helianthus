@@ -31,3 +31,9 @@ Install Android Studio, then build the Kotlin app against this contract. Create 
     cd core
     npx firebase login
     npx firebase deploy --only firestore:rules --project helianthic --config ../firebase.json
+
+## Update: verification without a device (2026-09-30)
+- This dev machine is a Snapdragon (ARM64) Windows laptop. The Android emulator cannot run on it (the x86 emulator gets no virtualization; it rejects ARM images). No physical phone was connected, so the app has NOT been launched on a device or emulator.
+- Added Robolectric UI tests: the real `MainActivity` launches, and the screens show labelled results, the "address not found" message, the "can't reach services" message, and the empty-address prompt. They run on the JVM and need an x64 JDK on Windows ARM (`-PtestJvm=...`). 23 tests pass.
+- Added an opt-in live test (`HELIANTHIC_LIVE=1`): the Kotlin pipeline with the app's own `UrlConnectionHttp` against the real APIs returned status OK (Census match, 1404.93 kWh/yr, 12 months, PVGIS-ERA5 2005-2023), and a nonsense address returned ADDRESS_NOT_FOUND.
+- Still to do: run the APK on a real phone (README Step 6), deploy the Firestore rules.
